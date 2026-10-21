@@ -1,18 +1,13 @@
 import requests
 
+
 def carregar_dados():
     try:
-
-        url_estados = (
-            "https://servicodados.ibge.gov.br/"
-            "api/v1/localidades/estados"
-        )
+        url_estados = "https://servicodados.ibge.gov.br/api/v1/localidades/estados"
 
         resposta_estados = requests.get(
-            url_estados,
-            params={"orderBy": "nome"},
-            timeout=20
-            )
+            url_estados, params={"orderBy": "nome"}, timeout=20
+        )
         resposta_estados.raise_for_status()
         estados = resposta_estados.json()
 
@@ -22,18 +17,16 @@ def carregar_dados():
             estados_por_id[id_uf] = {
                 "UF": estado["sigla"],
                 "Unidade da Federação": estado["nome"],
-                "Região": estado["regiao"]["nome"]
+                "Região": estado["regiao"]["nome"],
             }
 
         url_pobreza = (
             "https://servicodados.ibge.gov.br/"
-        "api/v3/agregados/5817/periodos/-1/variaveis/9617"
+            "api/v3/agregados/5817/periodos/-1/variaveis/9617"
         )
 
         resposta_pobreza = requests.get(
-            url_pobreza,
-            params={"localidades": "N3[all]"},
-            timeout=20
+            url_pobreza, params={"localidades": "N3[all]"}, timeout=20
         )
         resposta_pobreza.raise_for_status()
         pobreza = resposta_pobreza.json()
@@ -55,6 +48,7 @@ def carregar_dados():
     except Exception as erro:
         print(f"Erro ao carregar dados: {erro}")
         return [], "API do IBGE indisponível"
+
 
 # if __name__ == "__main__":
 #     dados, fonte = carregar_dados()
