@@ -1,16 +1,17 @@
 import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
+import requests
 
 from wordcloud import WordCloud
-from pathlib import Path
-
-RAIZ_PROJETO = Path(__file__).resolve().parent.parent
+from src.api_client import buscar_noticias_api
 
 
 @st.cache_data(ttl=3600)
-def carregar_noticias(caminho_arquivo):
-    return pd.read_csv(caminho_arquivo)
+def carregar_noticias():
+    resposta_api = buscar_noticias_api()
+
+    return pd.DataFrame(resposta_api["noticias"])
 
 
 st.header("Notícias relacionadas à pobreza")
@@ -22,11 +23,17 @@ dos indicadores oficiais.
     """
 )
 
-caminho_noticias = RAIZ_PROJETO / "data" / "processed" / "noticias_pobreza.csv"
+st.caption("Dados consultados por meio da API FastAPI desenvolvida para este projeto.")
 
-if caminho_noticias.exists():
-    df_noticias = carregar_noticias(caminho_noticias)
+erro_api = None
 
+try:
+    df_noticias = carregar_noticias()
+except requests.RequestException as erro:
+    df_noticias = None
+    erro_api = erro
+
+if df_noticias is not None:
     coluna_total, coluna_editorias = st.columns(2)
     coluna_total.metric("Publicações coletadas", len(df_noticias))
     coluna_editorias.metric("Editorias encontradas", df_noticias["editoria"].nunique())
@@ -104,4 +111,6 @@ if caminho_noticias.exists():
         st.info("""Não existem títulos disponíveis para gerar a nuvem de palavras""")
 
 else:
-    st.warning("O arquivo de notícias não foi encontrado.")
+    st.error("Não foi possível carregar as notícias da API.")
+
+    st.caption(f"Detalhes técnicos: {erro_api}")
