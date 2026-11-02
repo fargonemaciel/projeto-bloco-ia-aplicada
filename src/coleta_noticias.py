@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import time
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pathlib import Path
@@ -14,6 +15,19 @@ CABECALHOS = {
     ),
     "Accept-Language": "pt-BR,pt;q=0.9",
 }
+
+
+def coletar_texto_noticia(url):
+    resposta_noticia = requests.get(url, headers=CABECALHOS, timeout=30)
+    resposta_noticia.raise_for_status()
+    pagina_noticia = BeautifulSoup(resposta_noticia.text, "html.parser")
+    elemento_conteudo = pagina_noticia.select_one("div.conteudo-noticia")
+    if elemento_conteudo is None:
+        return ""
+    paragrafos = elemento_conteudo.select("p")
+    texto = " ".join(paragrafo.get_text(strip=True) for paragrafo in paragrafos)
+    return texto
+
 
 resposta = requests.get(URL_BUSCA, headers=CABECALHOS, timeout=30)
 print("Status da requisição:", resposta.status_code)
@@ -43,12 +57,22 @@ for bloco in bloco_noticias:
     if not link_relativo:
         continue
 
+    link_noticia = urljoin(URL_BUSCA, link_relativo)
+    try:
+        texto_noticia = coletar_texto_noticia(link_noticia)
+    except requests.RequestException as erro:
+        print(f"Erro ao coletar o conteúdo da notícia: {erro}")
+        texto_noticia = ""
+    time.sleep(1)
+
     noticia = {
         "titulo": elemento_titulo.get_text(strip=True),
         "editoria": elemento_editoria.get_text(strip=True),
         "data_publicacao": elemento_data.get_text(strip=True),
         "fonte": "Agencia Brasil",
-        "link": urljoin(URL_BUSCA, link_relativo),
+        "link": link_noticia,
+        "texto": texto_noticia,
+        "quantidade_palavras": len(texto_noticia.split()),
     }
 
     noticias_coletadas.append(noticia)
@@ -56,7 +80,13 @@ for bloco in bloco_noticias:
 print("Quantidade de notícias coletadas:", len(noticias_coletadas))
 print("Três primeiras notícias coletadas:")
 for noticia in noticias_coletadas[:3]:
-    print(noticia)
+    print(
+        {
+            "titulo": noticia["titulo"],
+            "quantidade_palavras": noticia["quantidade_palavras"],
+            "link": noticia["link"],
+        }
+    )
 
 if not noticias_coletadas:
     raise ValueError("Nenhuma notícia encontrada")
