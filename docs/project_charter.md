@@ -84,7 +84,7 @@ Desenvolver um dashboard interativo em Python com Streamlit que organize e apres
 - Aplicação preparada para deploy;
 
 ## 10. Riscos
-- Indisponibilidade da API na consulta inicial; (**Mitigação:** utilizar amostra local como fallback)
+- Indisponibilidade da API do IBGE; (**Mitigação:** utilizar snapshot local dos dados oficiais como fallback)
 - Mudança na estrutura do JSON; (**Mitigação:** separar o código de acesso aos dados, do código da aplicação)
 - Valores ausentes ou indisponíveis; (**Mitigação:** verificar a limitação dos dados)
 - Cobertura inferior às 27 UFs; (**Mitigação:** reavaliar fonte ou escopo do projeto)

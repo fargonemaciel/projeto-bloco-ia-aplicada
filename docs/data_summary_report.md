@@ -9,6 +9,7 @@ Este documento apresenta o primeiro levantamento das fontes de dados que serão 
 |---|---|---|---|
 | [SIDRA — Tabela 5817: Indicador 1.1.1](https://sidra.ibge.gov.br/tabela/5817) | API de Dados Agregados do IBGE | Semiestruturado — JSON | Obter a proporção da população abaixo da linha internacional de pobreza por Unidade da Federação e período |
 | [API de Localidades do IBGE](https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome) | API REST | Semiestruturado — JSON | Obter código, sigla, nome do estado e região geográfica |
+| `data/processed/indicadores_pobreza.csv` | Snapshot local gerado a partir das APIs do IBGE | Estruturado — CSV | Manter os indicadores disponíveis quando as APIs do IBGE estiverem temporariamente inacessíveis |
 | [Agência Brasil — Notícias sobre pobreza](https://agenciabrasil.ebc.com.br/tags/pobreza-0) | Extração de conteúdo web com BeautifulSoup | Semiestruturado — HTML | Obter notícias e textos relacionados à pobreza para contextualização dos indicadores e preparação para uso futuro com LLMs |
 | `data/processed/noticias_pobreza.csv` | Arquivo local | Estruturado — CSV | Armazenar título, editoria, data, fonte, link, texto e quantidade de palavras das notícias coletadas |
 | `data/sample/dados_complementares_exemplo.csv` | Arquivo local | Estruturado — CSV | Apresentar um exemplo de arquivo com informações complementares por UF |
@@ -40,6 +41,9 @@ Os dados complementares são armazenados em um arquivo CSV separado, que contém
 ## Preparação dos dados
 Os dados obtidos pelas APIs do IBGE são convertidos para uma estrutura tabular e organizados por Unidade da Federação. Durante a preparação, são selecionados as colunas necessárias, os valores do indicador são convertidos para o tipo numérico e os dados territoriais são associados aos indicadores por meio da sigla da UF.
 
+Quando a consulta ao vivo das APIs do IBGE não está disponível, a aplicação utiliza um snapshot local gerado previamente a partir das mesmas
+fontes oficiais. A origem utilizada é identificada na interface.
+
 As notícias são extraídas separadamente com BeautifulSoup e armazenadas em um arquivo CSV antes de serem utilizadas no painel. Além dos dados
 exibidos na interface, o processo acessa cada notícia para coletar seu texto e calcular a quantidade de palavras, preparando uma base textual
 para as funcionalidades com LLMs.
@@ -61,6 +65,8 @@ Os dados complementares enviados pelo usuário são associados aos indicadores p
 O indicador utilizado representa uma medida monetária da pobreza e não contempla todas as dimensões desse fenômeno social.
 
 A análise possui abrangência estadual e não apresenta dados em nível municipal. As notícias têm caráter complementar e não substituem os indicadores oficiais do IBGE. Além disso a disponibilidade das informações depende do funcionamento das fontes externas utilizadas.
+
+O snapshot de contingência pode não refletir uma atualização publicada pelo IBGE após sua última geração. Por isso, sua atualização deve ser realizada de forma controlada por meio do script de coleta.
 
 ## Disponibilização pela API
 Os dados processados são disponibilizados pela API FastAPI do projeto. A rota "/indicadores" fornece os indicadores de pobreza e aceita filtro

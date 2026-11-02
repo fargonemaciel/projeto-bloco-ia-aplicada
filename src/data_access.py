@@ -1,4 +1,25 @@
 import requests
+from pathlib import Path
+import pandas as pd
+
+RAIZ_PROJETO = Path(__file__).resolve().parent.parent
+
+CAMINHO_SNAPSHOT = RAIZ_PROJETO / "data" / "processed" / "indicadores_pobreza.csv"
+
+
+def carregar_snapshot():
+    if not CAMINHO_SNAPSHOT.exists():
+        return []
+    try:
+        df_snapshot = pd.read_csv(CAMINHO_SNAPSHOT)
+        dados_snapshot = df_snapshot.to_dict(orient="records")
+        for registro in dados_snapshot:
+            registro["Período"] = int(registro["Período"])
+        registro["Proporção (%)"] = float(registro["Proporção (%)"])
+        return dados_snapshot
+    except Exception as erro:
+        print(f"Erro ao carregar snapshot: {erro}")
+        return []
 
 
 def carregar_dados():
@@ -47,6 +68,9 @@ def carregar_dados():
 
     except Exception as erro:
         print(f"Erro ao carregar dados: {erro}")
+        dados_snapshot = carregar_snapshot()
+        if dados_snapshot:
+            return (dados_snapshot, "Snapshot local do IBGE - API ao vivo indisponível")
         return [], "API do IBGE indisponível"
 
 
