@@ -93,3 +93,29 @@ Desenvolver um dashboard interativo em Python com Streamlit que organize e apres
 - A análise está limitada ao nível estadual;
 - O indicador utilizado representa uma dimensão monetária da pobreza;
 - O projeto não analisa todas as dimensões sociais relacionadas à pobreza;
+
+## 12. Atualização do Projeto
+Nesta etapa, a aplicação foi reorganizada em múltiplas páginas, separando a apresentação do projeto, os indicadores, 
+as notícias e o planejamento para uso futuro da Inteligência Artificial.
+
+### Funcionalidades incorporados
+- Menu de navegação entre múltiplas páginas;
+- API própria desenvolvida com FastAPI;
+- Rotas para consulta de indicadores e notícias;
+- Integração da página de notícias com a API;
+- Ampliação da coleta realizada com BeautifulSoup;
+- Extração do texto das notícias e da quantidade de palavras;
+- Preparação da base textual para uso de LLM;
+
+### Decições técnicas
+O Selenium foi avaliado, mas não utilizado porque as fontes que usamos já disponibilizam os dados com HTML estático. Conforme
+orientação do TP3, priorizamos o aprimoramento da coleta com BeautifulSoup, evitando a inclusão de automaçao de navegador.
+
+A API foi organizada separadamente da interface. Ela fornece os dados, enquanto a aplicação Streamlit é responsável pela navegação, interação e apresentação das informações.
+
+### Preparação para Inteligência Artificial
+
+O caso de uso prioritário planejado para a próxima etapa é a geração de resumos fundamentadas nas notícias coletadas.
+As respostas deversão utilizar apenas o conteúdo fornecido, preservar a referência da fonte, informar quando os dados
+forem insuficientes.
+Nesta etapa foram preparados os dados e o formato inicial do prompt.

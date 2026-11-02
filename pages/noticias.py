@@ -5,6 +5,11 @@ import requests
 
 from wordcloud import WordCloud
 from src.api_client import buscar_noticias_api
+from pathlib import Path
+
+RAIZ_PROJETO = Path(__file__).resolve().parent.parent
+
+CAMINHO_NOTICIAS = RAIZ_PROJETO / "data" / "processed" / "noticias_pobreza.csv"
 
 
 @st.cache_data(ttl=3600)
@@ -12,6 +17,11 @@ def carregar_noticias():
     resposta_api = buscar_noticias_api()
 
     return pd.DataFrame(resposta_api["noticias"])
+
+
+@st.cache_data(ttl=3600)
+def carregar_noticias_csv():
+    return pd.read_csv(CAMINHO_NOTICIAS)
 
 
 st.header("Notícias relacionadas à pobreza")
@@ -23,17 +33,27 @@ dos indicadores oficiais.
     """
 )
 
-st.caption("Dados consultados por meio da API FastAPI desenvolvida para este projeto.")
 
 erro_api = None
+origem_dados = "API FastAPI do projeto"
 
 try:
     df_noticias = carregar_noticias()
 except requests.RequestException as erro:
-    df_noticias = None
     erro_api = erro
+    if CAMINHO_NOTICIAS.exists():
+        df_noticias = carregar_noticias_csv()
+        origem_dados = "Arquivo CSV local de contingência"
+    else:
+        df_noticias = None
 
 if df_noticias is not None:
+    if erro_api is not None:
+        st.warning(
+            """A API está temporariamente indisponível. Os dados foram carregados do arquivo CSV de contingência."""
+        )
+    st.caption(f"Origem dos dados: {origem_dados}")
+
     coluna_total, coluna_editorias = st.columns(2)
     coluna_total.metric("Publicações coletadas", len(df_noticias))
     coluna_editorias.metric("Editorias encontradas", df_noticias["editoria"].nunique())

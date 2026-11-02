@@ -6,12 +6,14 @@ st.set_page_config(
 
 pagina_inicio = st.Page("pages/inicio.py", title="Início", icon="🏠", default=True)
 
+pagina_ia = st.Page("pages/preparacao_ia.py", title="Preparação para IA", icon="🤖")
+
 pagina_indicadores = st.Page("pages/indicadores.py", title="Indicadores", icon="📊")
 
 pagina_noticias = st.Page("pages/noticias.py", title="Notícias", icon="📰")
 
 paginas = {
-    "Projeto": [pagina_inicio],
+    "Projeto": [pagina_inicio, pagina_ia],
     "Análises": [pagina_indicadores, pagina_noticias],
 }
 
