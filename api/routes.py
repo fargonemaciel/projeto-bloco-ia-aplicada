@@ -1,8 +1,9 @@
 import pandas as pd
 
 from pathlib import Path
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from src.data_access import carregar_dados
+from api.models import ResumoResposta, TextoParaResumo
 
 router = APIRouter()
 
@@ -59,3 +60,38 @@ def listar_indicadores(regiao: str | None = None):
         "fonte": fonte,
         "indicadores": indicadores_filtrados,
     }
+
+
+@router.post(
+    "/processar_texto", response_model=ResumoResposta, tags=["Inteligência Artificial"]
+)
+def processar_texto(dados: TextoParaResumo, request: Request):
+    tokenizador = getattr(request.app.state, "tokenizador_llm", None)
+    modelo = getattr(request.app.state, "modelo_llm", None)
+    funcao_resumo = getattr(request.app.state, "funcao_resumo", None)
+
+    if tokenizador is None or modelo is None or funcao_resumo is None:
+        raise HTTPException(
+            status_code=503,
+            detail="O modelo de linguagem local está indisponível Verifique se ele foi carregado corretamente.",
+        )
+    try:
+        resultado = funcao_resumo(dados.texto, tokenizador, modelo)
+    except ValueError as erro:
+        raise HTTPException(status_code=422, detail=str(erro)) from erro
+    except Exception as erro:
+        print(f"Erro durante a geração do resumo: {erro}")
+        raise HTTPException(
+            status_code=500,
+            detail=("Ocorreu um erro interno durante a geração do resumo."),
+        ) from erro
+
+    return ResumoResposta(
+        modelo=resultado["modelo"],
+        resumo=resultado["resumo"],
+        caracteres_entrada=len(dados.texto),
+        tokens_entrada=resultado["tokens_entrada"],
+        tokens_processados=resultado["tokens_processados"],
+        texto_truncado=resultado["texto_truncado"],
+        tempo_inferencia_segundos=resultado["tempo_inferencia_segundos"],
+    )

@@ -9,3 +9,13 @@ def buscar_noticias_api():
 
     resposta.raise_for_status()
     return resposta.json()
+
+
+def processar_texto_api(texto):
+    resposta = requests.post(
+        f"{API_BASE_URL}/processar_texto",
+        json={"texto": texto},
+        timeout=120,
+    )
+    resposta.raise_for_status()
+    return resposta.json()

@@ -68,13 +68,20 @@ A análise possui abrangência estadual e não apresenta dados em nível municip
 
 O snapshot de contingência pode não refletir uma atualização publicada pelo IBGE após sua última geração. Por isso, sua atualização deve ser realizada de forma controlada por meio do script de coleta.
 
+O modelo de linguagem pode omitir informações, apresentar falhas de escrita ou produzir respostas imprecisas. Por isso, a interface mantém a referência para o conteúdo original e informa quando o texto foi truncado.
+
 ## Disponibilização pela API
 Os dados processados são disponibilizados pela API FastAPI do projeto. A rota "/indicadores" fornece os indicadores de pobreza e aceita filtro
 opcional por região. A rota "/noticias" fornece os dados coletados da Agência Brasil. A página de notícias do Streamlit consulta a API em vez de abrir 
 diretamente o arquivo CSV.
 
-## Preparação para LLM
-A coluna "texto" poderá ser utilizada para geração de resumos, perguntas e respostas e identificação de termos recorrentes.
+A rota `POST /processar_texto` recebe o texto de uma notícia e retorna o resumo gerado pelo modelo local, juntamente com informações sobre tokens, truncamento, tempo de inferência e modelo utilizado.
+
+## Uso da base textual pela LLM
+
+A coluna `texto` é utilizada como entrada para o modelo local de sumarização. O conteúdo selecionado no Streamlit é enviado à rota `POST /processar_texto` da API FastAPI.
+
+O modelo processa até 512 tokens. Quando o texto ultrapassa esse limite, a resposta informa que houve truncamento. O resumo gerado não altera o arquivo original e deve ser conferido com a notícia de origem.
 
 ## Decisão sobre Selenium
 O uso de Selenium foi avaliado e considerado desnecessário, pois os indicadores estão disponíveis por API criado no projeto e as notícias

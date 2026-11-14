@@ -25,7 +25,7 @@ def coletar_texto_noticia(url):
     if elemento_conteudo is None:
         return ""
     paragrafos = elemento_conteudo.select("p")
-    texto = " ".join(paragrafo.get_text(strip=True) for paragrafo in paragrafos)
+    texto = " ".join(paragrafo.get_text(" ", strip=True) for paragrafo in paragrafos)
     return texto
 
 

@@ -6,7 +6,7 @@ st.set_page_config(
 
 pagina_inicio = st.Page("pages/inicio.py", title="Início", icon="🏠", default=True)
 
-pagina_ia = st.Page("pages/preparacao_ia.py", title="Preparação para IA", icon="🤖")
+pagina_ia = st.Page("pages/preparacao_ia.py", title="Resumo com IA", icon="🤖")
 
 pagina_indicadores = st.Page("pages/indicadores.py", title="Indicadores", icon="📊")
 

@@ -94,7 +94,7 @@ Desenvolver um dashboard interativo em Python com Streamlit que organize e apres
 - O indicador utilizado representa uma dimensão monetária da pobreza;
 - O projeto não analisa todas as dimensões sociais relacionadas à pobreza;
 
-## 12. Atualização do Projeto
+## 12. Atualização do Projeto - TP3
 Nesta etapa, a aplicação foi reorganizada em múltiplas páginas, separando a apresentação do projeto, os indicadores, 
 as notícias e o planejamento para uso futuro da Inteligência Artificial.
 
@@ -119,3 +119,20 @@ O caso de uso prioritário planejado para a próxima etapa é a geração de res
 As respostas deversão utilizar apenas o conteúdo fornecido, preservar a referência da fonte, informar quando os dados
 forem insuficientes.
 Nesta etapa foram preparados os dados e o formato inicial do prompt.
+
+## 13. Atualização do Projeto - TP4
+Nesta etapa, a aplicação passou a utilizar um modelo de linguagem executado localmente para gerar resumos das notícias coletadas sobre pobreza.
+
+### Funcionalidades incorporadas
+- Modelo de sumarização em português obtido da Hugging Face;
+- Execução local com Transformers e PyTorch;
+- Rota `POST /processar_texto` no FastAPI;
+- Validação da entrada e da resposta com Pydantic;
+- Tratamento de erros 422, 500 e 503;
+- Integração da funcionalidade com interface Streamlit;
+- Exibição do resumo, tempo de inferência, tokens processados e indicação de truncamento.
+
+### Decisão técnica
+O modelo `rhaymison/t5-portuguese-small-summarization` foi selecionado após comparação com outro modelo de sumarização em português. A escolha considerou fidelidade dos fatos resumidos, com custo computacional aceitável e possibilidade de execuação local com CPU.
+
+A funcionalidade possui caráter de apoio à leitura. Os resumos automáticos devem ser conferidos com o texto original e não substituem análise humana ou decisão sobre políticas públicas.
