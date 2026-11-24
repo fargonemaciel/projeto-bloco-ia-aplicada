@@ -1,7 +1,7 @@
 # Data Summary Report
 
 ## Objetivo do documento
-Este documento apresenta o primeiro levantamento das fontes de dados que serão utilizadas no Painel de Priorização Territorial de Combate à Pobreza, indicando o tipo dos dados e o objetivo de uso de cada fonte.
+Este documento apresenta as fontes, a preparação, a qualidade e o uso dos dados integrados ao Painel de Priorização Territorial de Combate à Pobreza, abrangendo indicadores oficiais, notícias coletadas por web scraping e os dados utilizados pelo modelo local de sumarização.
 
 ## Fonte dos dados
 
@@ -10,7 +10,7 @@ Este documento apresenta o primeiro levantamento das fontes de dados que serão 
 | [SIDRA — Tabela 5817: Indicador 1.1.1](https://sidra.ibge.gov.br/tabela/5817) | API de Dados Agregados do IBGE | Semiestruturado — JSON | Obter a proporção da população abaixo da linha internacional de pobreza por Unidade da Federação e período |
 | [API de Localidades do IBGE](https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome) | API REST | Semiestruturado — JSON | Obter código, sigla, nome do estado e região geográfica |
 | `data/processed/indicadores_pobreza.csv` | Snapshot local gerado a partir das APIs do IBGE | Estruturado — CSV | Manter os indicadores disponíveis quando as APIs do IBGE estiverem temporariamente inacessíveis |
-| [Agência Brasil — Notícias sobre pobreza](https://agenciabrasil.ebc.com.br/tags/pobreza-0) | Extração de conteúdo web com BeautifulSoup | Semiestruturado — HTML | Obter notícias e textos relacionados à pobreza para contextualização dos indicadores e preparação para uso futuro com LLMs |
+| [Agência Brasil — Notícias sobre pobreza](https://agenciabrasil.ebc.com.br/tags/pobreza-0) | Extração de conteúdo web com BeautifulSoup | Semiestruturado — HTML | Obter notícias e textos relacionados à pobreza para contextualização dos indicadores e sumarização automática com o modelo local |
 | `data/processed/noticias_pobreza.csv` | Arquivo local | Estruturado — CSV | Armazenar título, editoria, data, fonte, link, texto e quantidade de palavras das notícias coletadas |
 | `data/sample/dados_complementares_exemplo.csv` | Arquivo local | Estruturado — CSV | Apresentar um exemplo de arquivo com informações complementares por UF |
 
@@ -50,6 +50,22 @@ para as funcionalidades com LLMs.
 
 Os dados complementares enviados pelo usuário são associados aos indicadores pela sigla da UF.
 
+## Dados e resultados derivados
+A partir dos dados processados, a aplicação produz:
+
+- total de Unidades da Federação disponíveis;
+- período de referência;
+- identificação da UF com maior valor do indicador;
+- ranking das cinco maiores proporções;
+- médias simples dos indicadores estaduais agrupados por região;
+- contagem de notícias e textos disponíveis;
+- resumos automáticos das notícias selecionadas;
+- quantidade de tokens recebidos e processados;
+- indicação de truncamento;
+- tempo de inferência do modelo local.
+
+Os cálculos territoriais são realizados com pandas e não pela LLM. O modelo de linguagem é utilizado exclusivamente para sumarizar os textos coletados.
+
 ## Verificações de qualidade
 - Validade das respostas das fontes externas;
 - Identificação do período mais recente disponível;
@@ -61,6 +77,20 @@ Os dados complementares enviados pelo usuário são associados aos indicadores p
 - Contagem de palavras dos conteúdos extraídos;
 - Verificação da disponibilidade do arquivo processado pela API.
 
+## Integração no ciclo de Ciência de Dados
+Os indicadores do IBGE são utilizados para cálculos, filtros, rankings, métricas e gráficos territoriais. As notícias coletadas da Agência Brasil formam a bse textual utilizada pelo modelo de linguagem.
+
+O fluxo de dados é composto por:
+1. coleta por APIs e web scraping;
+2. armazenamento dos dados processados em CSV;
+3. validação e transformação com Pandas;
+4. análise descritiva dos indicadores;
+5. sumarização dos textos com o modelo local;
+6. disponibilização dos dados e da IA pela API FastAPI;
+7. apresentação dos resultados no dashboard Streamlit.
+
+Os indicadores oficiais e os textos jornalísticos permanecem separados. As notícias complementam o contexto, mas não substituem os dados do IBGE.
+
 ## Limitações 
 O indicador utilizado representa uma medida monetária da pobreza e não contempla todas as dimensões desse fenômeno social.
 
@@ -69,6 +99,8 @@ A análise possui abrangência estadual e não apresenta dados em nível municip
 O snapshot de contingência pode não refletir uma atualização publicada pelo IBGE após sua última geração. Por isso, sua atualização deve ser realizada de forma controlada por meio do script de coleta.
 
 O modelo de linguagem pode omitir informações, apresentar falhas de escrita ou produzir respostas imprecisas. Por isso, a interface mantém a referência para o conteúdo original e informa quando o texto foi truncado.
+
+As médias apresentadas por região são médias simples dos indicadores das Unidades da Federação. Elas não correspondem a taxas regionais oficiais ponderadas pela população.
 
 ## Disponibilização pela API
 Os dados processados são disponibilizados pela API FastAPI do projeto. A rota "/indicadores" fornece os indicadores de pobreza e aceita filtro

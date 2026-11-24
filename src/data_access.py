@@ -15,7 +15,7 @@ def carregar_snapshot():
         dados_snapshot = df_snapshot.to_dict(orient="records")
         for registro in dados_snapshot:
             registro["Período"] = int(registro["Período"])
-        registro["Proporção (%)"] = float(registro["Proporção (%)"])
+            registro["Proporção (%)"] = float(registro["Proporção (%)"])
         return dados_snapshot
     except Exception as erro:
         print(f"Erro ao carregar snapshot: {erro}")

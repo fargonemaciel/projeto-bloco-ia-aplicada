@@ -18,15 +18,15 @@ def carregar_base_textual():
 st.title("Resumo de notícias com Inteligência Artificial")
 st.write(
     """
-    Selecione uma notícia sobre pobreza e gere um resumo utilizando
-    um modelo de lingaugem executado localmente pela API FastAPI.
+    Esta página utiliza um modelo de linguagem executado localmente para produzir
+    resumos automáticos das notícias sobre pobreza coletadas por web scraping.
     """
 )
 
 st.info(
     """
-    O resumo é produzido automaticamente por Inteligência Artificial.
-    Confira sempre o conteúdo original antes de utilizar as informações.
+    O modelo é carregado pela API FastAPI no ambiente local. O texto selecionado é enviado para a rota `/processar_texto`,
+    que retorna o resumo e as informações técnicas da execução.
     """
 )
 

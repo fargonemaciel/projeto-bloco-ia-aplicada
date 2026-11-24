@@ -15,6 +15,23 @@ O usuário seleciona uma notícia no Streamlit, e o texto é enviado à API Fast
 | Python | 3.14.6 |
 | Execução | CPU local |
 
+## Criação do ambiente virtual
+Foi criado um ambiente virtual separado para as dependências locais da LLM. No Git Bash do Windows, foram utilizados os seguintes comandos:
+
+```bash
+python -m venv "/c/Python Projects/venvs/painel_pobreza_tp4"
+
+source "/c/Python Projects/venvs/painel_pobreza_tp4/Scripts/activate"
+
+python -m pip install --upgrade pip
+
+python -m pip install -r requirements.txt
+
+python -m pip install -r requirements-llm.txt
+
+python -m pip check
+```
+
 ## Bibliotecas principais:
 - PyTorch 2.15.0+cpu;
 - Transformers 5.22.2;
@@ -31,7 +48,7 @@ O usuário seleciona uma notícia no Streamlit, e o texto é enviado à API Fast
 | Inferência observada | 11,12 s | 7,77 s |
 | Resultado | Preservou os fatos principais | Introduziu informações incorretas |
 
-No teste realizado, o primeiro modelo preservou o percentual de 32,3% e o período de 2026. O Segundo informou incorretamente o ano de 2024 e mencionou Néstor Kirchner, informação ausente da notícia.
+No teste realizado, o primeiro modelo preservou o percentual de 32,3% e o período de 2026. O segundo informou incorretamente o ano de 2024 e mencionou Néstor Kirchner, informação ausente da notícia.
 
 ## Modelo escolhido
 Foi selecionado `rhaymison/t5-portuguese-small-summarization` considerando:
@@ -40,6 +57,13 @@ Foi selecionado `rhaymison/t5-portuguese-small-summarization` considerando:
 - **Acessibilidade:** está disponível no Hugging Face e funciona em CPU.
 
 O modelo apresentou falhas de acentuação em algumas palavras, mas essa limitação foi considerada menos grave do que a criação de informações incorretas.
+
+## Engenharia de prompt
+O modelo recebe a instrução definida em `src/resumidor_llm.py`:
+
+```python
+PROMPT_RESUMO = "sumarize: {texto}"
+```
 
 ## Configuração local:
 As dependências de IA foram separadas em requirements-llm.txt, evitando instalar PyTorch e Transformers nos serviços publicados no Render durante o TP3.
@@ -55,7 +79,7 @@ O modelo é armazenado no cache da Hugging Face e não é enviado ao GitHub.
 Durante a configuração, foi necessário atualizar o Protobuf para versão 7.36.1 devido à compatibilidade com o SentencePiece.
 
 ## Integração com FastAPI
-O modelo é carregado uma única vez durante o `lifespan` da API e armazenado em `app.state`
+O modelo é carregado uma única vez durante o `lifespan` da API e armazenado em `app.state`.
 
 O fluxo implementado é:
 1. o Streamlit seleciona o texto da notícia;
@@ -115,6 +139,13 @@ A resposta contém:
 | 503 | Modelo local indisponível |
 
 Os retornos 422, 500 e 503 foram simulados e testados.
+
+## Consolidação da solução no TP5
+Entre as opções propostas no TP5, foi escolhida a automação de sumarização de textos com LLM.
+
+A escolha aproveita diretamente os dados textuais coletados por web scraping. O usuário seleciona uma notícia no dashboard, solicita o proecssamento e recebe um resumo gerado localmente, acompanhado das informações técnicas da inferência e do link para a fonte original.
+
+A solução não implementa memória conversacional nem agente autônomo, pois essas funcionalidades não são necessárias para o problema definido. A sumarização mantém o escopo objetivo, reduz custo computacional e utiliza diretamente a base textual construída durante todo o projeto.
 
 ## Limitações
 

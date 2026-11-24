@@ -5,11 +5,13 @@ import torch
 
 MODELO_ID = "rhaymison/t5-portuguese-small-summarization"
 LIMITE_TOKENS_ENTRADA = 512
+PROMPT_RESUMO = "sumarize: {texto}"
 ARQUIVOS_NECESSARIOS = [
     "config.json",
+    "generation_config.json",
     "model.safetensors",
     "special_tokens_map.json",
-    "spiece.model",
+    "tokenizer.json",
     "tokenizer_config.json",
 ]
 
@@ -36,7 +38,7 @@ def gerar_resumo(texto, tokenizador, modelo):
     texto_limpo = texto.strip()
     if not texto_limpo:
         raise ValueError("O texto fornecido não pode estar vazio.")
-    texto_preparado = f"sumarize: {texto_limpo}"
+    texto_preparado = PROMPT_RESUMO.format(texto=texto_limpo)
     tokens_completos = tokenizador(
         texto_preparado,
         add_special_tokens=True,
